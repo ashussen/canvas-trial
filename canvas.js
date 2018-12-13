@@ -34,13 +34,12 @@ function Square(x, y, size) {
   this.size = size;
   this.centerX = x + size/2;
   this.centerY = y + size/2;
-
-  this.draw = function() {
+  this.radius = Math.hypot(size/2, size/2);
+this.draw = function() {
     c.fillStyle = colors[colorNumber];
     c.fillRect(this.x, this.y, this.size, this.size);
   }
 
-  this.draw();
 }
 
 function Triangle(x, y, size) {
@@ -67,41 +66,62 @@ function getRandomLength(min, max) {
   return Math.floor(randomLength);
 }
 
-function isOverlapping(x, y) {
-  for(var i = 0; i < shapes.length; i++) {
-    if(shapes[i] instanceof Square) {
-      if(x > shapes[i].x && x < shapes[i].x + shapes[i].size ||   // if x is between the other shapes
-         y > shapes[i].y && x < shapes[i].y + shapes[i].size ){   // if y is between the other shapes
-        return true;
-      }
-    }
-  }
-  return false;
+function getDistance(x1, y1, x2, y2) {
+  return Math.hypot(x2-x1, y2-y1)
 }
+
+//function isOverlapping(x, y) {
+//  for(var i = 0; i < shapes.length; i++) {
+//    if(shapes[i] instanceof Square) {
+//      if(x > shapes[i].x && x < shapes[i].x + shapes[i].size ||   // if x is between the other shapes
+//         y > shapes[i].y && x < shapes[i].y + shapes[i].size ){   // if y is between the other shapes
+//        return true;
+//      }
+//    }
+//  }
+//  return false;
+//}
 
 function distance(ax, ay, bx,by) {
   return Math.hypot(ax-bx, ay-by);
 }
 
-//for(var i = 0; i < totalShapes; i++) {
-//  var size = getRandomLength(minShapeSize, maxShapeSize);
-//  var x  = Math.floor(Math.random()*(canvas.width - size));
-//  var y  = Math.floor(Math.random()*(canvas.height - size));
-//  var colorNumber = Math.floor(Math.random()*colors.length);
-//
-//  if(!isOverlapping(x,y)) {
-//    switch(Math.floor(Math.random() * 1)) {
-//      case 1:
-//        shapes.push(new Square(x, y, size)); break;
-//      case 2:
-//        shapes.push(new Circle(x, y, size)); break;
-//      case 3:
-//        shapes.push(new Triangle(x, y, size)); break;
-//      default:
-//        shapes.push(new Square(x, y, size)); break;
-//    }
-//  }
-//}
+for(var i = 0; i < totalShapes; i++) {
+  var size = getRandomLength(minShapeSize, maxShapeSize);
+  var x  = Math.floor(Math.random()*(canvas.width - size));
+  var y  = Math.floor(Math.random()*(canvas.height - size));
+  var colorNumber = Math.floor(Math.random()*colors.length);
+
+
+  //switch(Math.floor(Math.random() * 1)) {
+  //  case 1:
+      if(shapes.length < 1) {
+        shapes.push(new Square(x, y, size));
+      } else {
+        for(var j = 0; j < shapes.length; j++) {
+          var square = new Square(x, y, size);
+          var distance = getDistance(square.centerX, square.centerY, shapes[j].centerX, shapes[j].centerY);
+          console.log('Distance :' + distance);
+          console.log('Combined Radius:' + square.radius + shapes[j].radius);
+          if( distance > square.radius + shapes[j].radius) {
+            shapes.push(square);
+            break;
+          }
+        }
+      }
+ //     break;
+ //   case 2:
+      //shapes.push(new Circle(x, y, size)); break;
+ //   case 3:
+      //shapes.push(new Triangle(x, y, size)); break;
+ //   default:
+      //shapes.push(new Square(x, y, size)); break;
+ // }
+}
+
+for(var i = 0; i < shapes.length; i++) {
+  shapes[i].draw();
+}
 
 //c.beginPath();
 //c.moveTo(0,0);
@@ -114,8 +134,6 @@ function distance(ax, ay, bx,by) {
 //c.arc(50, 50, 50, 0, Math.PI * 2, false);
 //c.fillStyle = 'green';
 //c.fill();
-
-console.log(distance(0,0,50,50));
 
 console.log(shapes);
 
