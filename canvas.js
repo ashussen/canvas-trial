@@ -70,20 +70,24 @@ function getDistance(x1, y1, x2, y2) {
   return Math.hypot(x2-x1, y2-y1)
 }
 
-//function isOverlapping(x, y) {
-//  for(var i = 0; i < shapes.length; i++) {
-//    if(shapes[i] instanceof Square) {
-//      if(x > shapes[i].x && x < shapes[i].x + shapes[i].size ||   // if x is between the other shapes
-//         y > shapes[i].y && x < shapes[i].y + shapes[i].size ){   // if y is between the other shapes
-//        return true;
-//      }
-//    }
-//  }
-//  return false;
-//}
-
 function distance(ax, ay, bx,by) {
   return Math.hypot(ax-bx, ay-by);
+}
+
+function isOverlapping(shape) {
+  var overlapping = false;
+
+  for(var j = 0; j < shapes.length; j++) {
+    var distance = getDistance(shape.centerX, shape.centerY, shapes[j].centerX, shapes[j].centerY);
+    console.log('Distance :' + distance);
+    console.log('Combined Radius:' + square.radius + shapes[j].radius);
+    if( distance < shape.radius + shapes[j].radius) {
+      overlapping = true;
+      break;
+    }
+  }
+
+  return overlapping;
 }
 
 for(var i = 0; i < totalShapes; i++) {
@@ -93,22 +97,32 @@ for(var i = 0; i < totalShapes; i++) {
   var colorNumber = Math.floor(Math.random()*colors.length);
 
 
-  //switch(Math.floor(Math.random() * 1)) {
-  //  case 1:
-      if(shapes.length < 1) {
+  var randomizeShape = Math.floor(Math.random() * 1 + 1);
+  console.log(randomizeShape);
+
+  if(randomizeShape == 1) {
+    if(shapes.length < 1) {
         shapes.push(new Square(x, y, size));
       } else {
-        for(var j = 0; j < shapes.length; j++) {
-          var square = new Square(x, y, size);
-          var distance = getDistance(square.centerX, square.centerY, shapes[j].centerX, shapes[j].centerY);
-          console.log('Distance :' + distance);
-          console.log('Combined Radius:' + square.radius + shapes[j].radius);
-          if( distance > square.radius + shapes[j].radius) {
-            shapes.push(square);
-            break;
-          }
+        var square = new Square(x, y, size);
+
+        if(!isOverlapping(square)) {
+          shapes.push(square);
         }
       }
+
+  }
+  //switch(Math.floor(Math.random() * 1)) {
+  //  case 1:
+  //    if(shapes.length < 1) {
+  //      shapes.push(new Square(x, y, size));
+  //    } else {
+  //      var square = new Square(x, y, size);
+
+  //      if(!isOverlapping(square)) {
+  //        shapes.push(square);
+  //      }
+  //    }
  //     break;
  //   case 2:
       //shapes.push(new Circle(x, y, size)); break;
@@ -122,18 +136,6 @@ for(var i = 0; i < totalShapes; i++) {
 for(var i = 0; i < shapes.length; i++) {
   shapes[i].draw();
 }
-
-//c.beginPath();
-//c.moveTo(0,0);
-//c.lineTo(100,0);
-//c.lineTo(100,100);
-//c.lineTo(0,100);
-//c.fill();
-//
-//c.beginPath();
-//c.arc(50, 50, 50, 0, Math.PI * 2, false);
-//c.fillStyle = 'green';
-//c.fill();
 
 console.log(shapes);
 
