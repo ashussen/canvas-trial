@@ -3,19 +3,22 @@ var colors = ['#f0941d','#0071b3','#00a5e6','#80bb42','#ee411f'];
 var totalShapes = 10;
 var maxShapeSize = 150;
 var minShapeSize = 30;
+var opacity = 0.3;
 var shapes = new Array();
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 var c = canvas.getContext('2d');
-
+c.globalAlpha = opacity;
 
 function Circle(x, y, radius) {
   var colorNumber = Math.floor(Math.random() * colors.length);
   this.x = x;
   this.y = y;
   this.radius = radius;
+  this.centerX = x;
+  this.centerY = y;
 
   this.draw = function() {
     c.beginPath();
@@ -23,8 +26,6 @@ function Circle(x, y, radius) {
     c.fillStyle = colors[colorNumber];
     c.fill();
   }
-
-  this.draw();
 }
 
 function Square(x, y, size) {
@@ -35,7 +36,7 @@ function Square(x, y, size) {
   this.centerX = x + size/2;
   this.centerY = y + size/2;
   this.radius = Math.hypot(size/2, size/2);
-this.draw = function() {
+  this.draw = function() {
     c.fillStyle = colors[colorNumber];
     c.fillRect(this.x, this.y, this.size, this.size);
   }
@@ -44,20 +45,22 @@ this.draw = function() {
 
 function Triangle(x, y, size) {
   var colorNumber = Math.floor(Math.random() * colors.length);
+  this.height = Math.floor(size * 433/500);
   this.x = x;
   this.y = y;
   this.size = size;
+  this.centerX = (this.x + (this.x + this.size/2) + (this.x - this.size/2)) / 3;
+  this.centerY = (this.y + (this.y + this.height) + (this.y + this.height)) / 3;
+  this.radius = this.centerY - this.y;
 
   this.draw = function() {
     c.fillStyle = colors[colorNumber];
     c.beginPath();
     c.moveTo(this.x, this.y);
-    c.lineTo(this.x + this.size/2, this.y + this.size/2);
-    c.lineTo(this.x - this.size/2, this.y + this.size/2);
+    c.lineTo(this.x + this.size/2, this.y + this.height);
+    c.lineTo(this.x - this.size/2, this.y + this.height);
     c.fill();
   }
-
-  this.draw();
 }
 
 function getRandomLength(min, max) {
@@ -79,8 +82,6 @@ function isOverlapping(shape) {
 
   for(var j = 0; j < shapes.length; j++) {
     var distance = getDistance(shape.centerX, shape.centerY, shapes[j].centerX, shapes[j].centerY);
-    console.log('Distance :' + distance);
-    console.log('Combined Radius:' + square.radius + shapes[j].radius);
     if( distance < shape.radius + shapes[j].radius) {
       overlapping = true;
       break;
@@ -90,53 +91,42 @@ function isOverlapping(shape) {
   return overlapping;
 }
 
+
+//sorting not overlapping shapes
 for(var i = 0; i < totalShapes; i++) {
   var size = getRandomLength(minShapeSize, maxShapeSize);
   var x  = Math.floor(Math.random()*(canvas.width - size));
   var y  = Math.floor(Math.random()*(canvas.height - size));
   var colorNumber = Math.floor(Math.random()*colors.length);
 
-
-  var randomizeShape = Math.floor(Math.random() * 1 + 1);
+  var randomizeShape = Math.floor(Math.random() * 3 + 1);
   console.log(randomizeShape);
 
-  if(randomizeShape == 1) {
-    if(shapes.length < 1) {
-        shapes.push(new Square(x, y, size));
-      } else {
-        var square = new Square(x, y, size);
-
-        if(!isOverlapping(square)) {
-          shapes.push(square);
-        }
-      }
-
+  if(shapes.length < 1) {
+    //initiate the first shape
+    shapes.push(new Square(x, y, size));
   }
-  //switch(Math.floor(Math.random() * 1)) {
-  //  case 1:
-  //    if(shapes.length < 1) {
-  //      shapes.push(new Square(x, y, size));
-  //    } else {
-  //      var square = new Square(x, y, size);
 
-  //      if(!isOverlapping(square)) {
-  //        shapes.push(square);
-  //      }
-  //    }
- //     break;
- //   case 2:
-      //shapes.push(new Circle(x, y, size)); break;
- //   case 3:
-      //shapes.push(new Triangle(x, y, size)); break;
- //   default:
-      //shapes.push(new Square(x, y, size)); break;
- // }
+  switch(randomizeShape) {
+    case 1:
+      var square = new Square(x, y, size);
+      if(!isOverlapping(square)) { shapes.push(square); }
+      break;
+     case 2:
+      var circle = new Circle(x, y, size);
+      if(!isOverlapping(circle)) { shapes.push(circle); }
+      break;
+     case 3:
+      var triangle = new Triangle(x, y, size);
+      if(!isOverlapping(triangle)) { shapes.push(triangle); }
+      break;
+   }
 }
 
+//actually drawing not overlapping shapes
 for(var i = 0; i < shapes.length; i++) {
   shapes[i].draw();
 }
 
 console.log(shapes);
-
 
